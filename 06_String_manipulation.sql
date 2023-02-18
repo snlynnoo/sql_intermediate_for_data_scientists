@@ -144,3 +144,5 @@ WHERE job_title SIMILAR TO 'vp%a%'; -- 'vp%a' is completely different
 SELECT DISTINCT job_title
 FROM data_sci.employees
 WHERE job_title SIMILAR TO 'vp (a|m)%'; -- accounting or marketing
+
+-- SOUNDEX 
