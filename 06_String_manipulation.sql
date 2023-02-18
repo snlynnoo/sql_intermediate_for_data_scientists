@@ -145,4 +145,41 @@ SELECT DISTINCT job_title
 FROM data_sci.employees
 WHERE job_title SIMILAR TO 'vp (a|m)%'; -- accounting or marketing
 
--- SOUNDEX 
+
+-- STRING MATCHING WITH 'fuzzystrmatch' EXTENSION
+
+-- install fuzzystrmatch
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+
+-- checking the extension if installed 
+SELECT * FROM pg_extension WHERE extname = 'fuzzystrmatch';
+
+-- SOUNDEX function for mispelled matching 
+
+SELECT	SOUNDEX('Postgres'),  -- return P232
+		SOUNDEX('Postgresss'), -- return P232, they are similar
+		('Postgres' = 'Postgresss'), -- return 'false'
+		(SOUNDEX('Postgres') = SOUNDEX('Postgresss')); -- return 'true'
+
+-- DIFFERENCE function for a distance measure which check the return from SOUNDEX 
+
+SELECT DIFFERENCE('Postgres', 'Postgresss') -- return 4
+SELECT DIFFERENCE('Postgres', 'Kostgresss') -- return 3
+-- DIFFERENCE returns a range of 0 ~ 4
+-- it actually check the soundex code
+-- 0 means not match at all 
+-- 4 means exact match => the Soundex code is the same
+
+SELECT	SOUNDEX('Postgres'), -- return P232
+		SOUNDEX('Kostgres'), -- return K232
+		DIFFERENCE('Postgres', 'Kostgres'); -- return 3
+-- DIFFERENCE help the input string to how much it is acceptable for mispelled tolerance
+
+-- LEVENSHTEIN function for different are they - return a distance between two strings
+-- Pronounces as leventh taine 
+-- it tell the number of operatins to perform on the first string to match the second string.
+
+SELECT LEVENSHTEIN('Postgres', 'Postgres'); -- return 0
+SELECT LEVENSHTEIN('Postgres', 'mySQL'); -- 8
+-- it also ideal for checking for long characters/paragraph and decide
+-- how much is acceptable like 20 words
